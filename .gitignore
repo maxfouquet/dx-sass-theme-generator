@@ -1,0 +1,12 @@
+.vscode
+yarn-error.log
+yarn.lock
+node
+node_modules
+/.classpath
+/.project
+/.settings
+*.iml
+*.ipr
+target
+src/main/import/content

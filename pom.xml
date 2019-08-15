@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ==========================================================================================
+    =                   JAHIA'S DUAL LICENSING - IMPORTANT INFORMATION                       =
+    ==========================================================================================
+                                    http://www.jahia.com
+        Copyright (C) 2002-2019 Jahia Solutions Group SA. All rights reserved.
+        THIS FILE IS AVAILABLE UNDER TWO DIFFERENT LICENSES:
+        1/GPL OR 2/JSEL
+        1/ GPL
+        ==================================================================================
+        IF YOU DECIDE TO CHOOSE THE GPL LICENSE, YOU MUST COMPLY WITH THE FOLLOWING TERMS:
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU General Public License for more details.
+        You should have received a copy of the GNU General Public License
+        along with this program. If not, see <http://www.gnu.org/licenses/>.
+        2/ JSEL - Commercial and Supported Versions of the program
+        ===================================================================================
+        IF YOU DECIDE TO CHOOSE THE JSEL LICENSE, YOU MUST COMPLY WITH THE FOLLOWING TERMS:
+        Alternatively, commercial and supported versions of the program - also known as
+        Enterprise Distributions - must be used in accordance with the terms and conditions
+        contained in a separate written agreement between you and Jahia Solutions Group SA.
+        If you are unsure which license is appropriate for your use,
+        please contact the sales department at sales@jahia.com.
+-->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jahia.modules</groupId>
+    <artifactId>jahia-modules</artifactId>
+    <version>7.3.0.2</version>
+  </parent>
+  <artifactId>dx-sass-theme-generator</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>bundle</packaging>
+  <name>DX Sass Theme Generator</name>
+  <description>Build your own Jahia DX themes with Sass</description>
+  <scm>
+    <connection>scm:git@github.com:maxfouquet/next.js-typescript-starter.git</connection>
+    <developerConnection>scm:git@github.com:maxfouquet/next.js-typescript-starter.git</developerConnection>
+    <url>https://github.com/maxfouquet/dx-sass-theme-generator.git</url>
+  </scm>
+  <properties>
+    <jahia-module-type>templatesSet</jahia-module-type>
+    <jahia-depends>default</jahia-depends>
+  </properties>
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>jahia-public</id>
+      <name>Jahia Public Repository</name>
+      <url>https://devtools.jahia.com/nexus/content/groups/public</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>jahia-public</id>
+      <name>Jahia Public Repository</name>
+      <url>https://devtools.jahia.com/nexus/content/groups/public</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Import-Package>org.jahia.services.search,
+                            ${jahia.plugin.projectPackageImport},
+                            *</Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+
+      <plugin>
+          <groupId>com.github.eirslett</groupId>
+          <artifactId>frontend-maven-plugin</artifactId>
+          <version>1.7.6</version>
+
+         <executions>
+            <execution>
+              <id>install node and yarn</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>install-node-and-yarn</goal>
+              </goals>
+              <configuration>
+                <nodeVersion>v11.6.0</nodeVersion>
+                <yarnVersion>v1.12.3</yarnVersion>
+              </configuration>
+            </execution>
+            
+            <execution>
+              <id>yarn</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>yarn</goal>
+              </goals>
+            </execution>
+            <execution>
+                <id>gulp build</id>
+                <goals>
+                  <goal>gulp</goal>
+                </goals>
+                <configuration>
+                  <arguments>run</arguments>
+                </configuration>
+                <phase>generate-resources</phase>
+            </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

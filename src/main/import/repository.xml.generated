@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
+    <modules jcr:primaryType="jnt:modules">
+        <dx-sass-theme-generator j:dependencies="default"
+                               j:installedModules="dx-sass-theme-generator"
+                               j:modulePriority="0"
+                               j:moduleType="templatesSet"
+                               j:title="DX Sass Theme Generator"
+                               jcr:mixinTypes="jmix:hasExternalProviderExtension"
+                               jcr:primaryType="jnt:module">
+                
+                <portlets jcr:primaryType="jnt:portletFolder"/>
+                <files jcr:primaryType="jnt:folder"/>
+                <contents jcr:primaryType="jnt:contentFolder"/>
+                <templates jcr:primaryType="jnt:templatesFolder">
+                    <files jcr:primaryType="jnt:folder">
+                        <themes jcr:mixinTypes="jmix:hasExternalProviderExtension" jcr:primaryType="jnt:folder"><cerulean jcr:primaryType="jnt:folder"><main.css jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></main.css></cerulean><materia jcr:primaryType="jnt:folder"><main.css jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></main.css></materia></themes>
+                    </files>
+                    <contents jcr:primaryType="jnt:contentFolder"/>
+                    <themes jcr:mixinTypes="jmix:hasExternalProviderExtension"
+                    jcr:primaryType="jnt:folder"/>
+                    <base j:hiddenTemplate="false"
+                  j:view="dx-sass-theme-generator"
+                  jcr:primaryType="jnt:template">
+                        <j:translation_fr jcr:language="fr"
+                                 jcr:mixinTypes="mix:title"
+                                 jcr:primaryType="jnt:translation"
+                                 jcr:title="base"/>
+                        <home j:hiddenTemplate="false"
+                     j:view="dx-sass-theme-generator"
+                     jcr:primaryType="jnt:pageTemplate">
+                            <j:translation_fr jcr:language="fr"
+                                    jcr:mixinTypes="mix:title"
+                                    jcr:primaryType="jnt:translation"
+                                    jcr:title="home"/>
+                            <pagecontent jcr:primaryType="jnt:contentList"/>
+                        </home>
+                    </base>
+                </templates>
+                
+                <home j:templateName="home" jcr:primaryType="jnt:page">
+                    <j:translation_fr jcr:language="fr"
+                              jcr:mixinTypes="mix:title"
+                              jcr:primaryType="jnt:translation"
+                              jcr:title="home"/>
+                </home>
+            </dx-sass-theme-generator>
+    </modules>
+</content>

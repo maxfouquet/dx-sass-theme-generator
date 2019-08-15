@@ -6,6 +6,7 @@ import * as del from 'del';
 import * as sass from 'gulp-sass';
 import * as gutil from 'gulp-util';
 import * as rename from 'gulp-rename';
+import * as replace from 'gulp-replace';
 
 var merge = require('merge-stream');
 var header = require('gulp-header');
@@ -13,47 +14,63 @@ var header = require('gulp-header');
 @Gulpclass()
 export class Gulpfile {
 
-    private pattern: string = '*.scss';
-    private repositoryXml: string = './src/main/import/repository.xml';
-    private repositoryXmlGenerated: string = './src/main/import/repository.xml.generated';
-    private resourcesFolder: string = './src/main/resources/sass/resources/';
-    private mainFilesFolder: string = './src/main/resources/sass/themes/';
-    private themesFolder: string ='./src/main/import/content/modules/dx-sass-theme-generator/templates/files/themes/';
-    private themes: Array<string> = ['cerulean', 'materia'];
-    private requiredVars: Array<string> = ['$primary-color'];
+    private module: string = 'dx-sass-theme-generator';
 
-    xml(path: string, content: string): void{
-        fs.readFile(path, 'utf8', (err: ErrnoException | null, data: string) => {
-            if (err) {
-                throw new gutil.PluginError({
-                    plugin: 'repository',
-                    message: 'xml was not found in path' + path
-                });
-            } else {
-                let xml = data;
-                let xmlUpdated = xml.replace(/<themes[^>]*>([\s\S]*?)<\/themes>/, content);
-               
-                fs.writeFile(path, xmlUpdated, (err: ErrnoException | null) => {
-                    if (err) {
-                        throw new gutil.PluginError({
-                            plugin: 'repository',
-                            message: 'Can\'t override ' + path
-                        });
-                    }
-                });
-            }
+    private required_vars: Array<string> = ['$primary-color'];
+
+    private repository: string = './src/main/import/';
+    private sass_resources: string = './src/main/resources/sass/resources/';
+    private sass_themes: string = './src/main/resources/sass/themes/';
+    private themes_folder: string ='./src/main/import/content/modules/' + this.module + '/templates/files/themes/';
+
+    private themes: Array<string> = [];
+
+    /*
+    * Outputs themes as Xml
+    */
+    getXml(): string {
+        let themes_xml = '<themes jcr:mixinTypes="jmix:hasExternalProviderExtension" jcr:primaryType="jnt:folder">';
+        this.themes = fs.readdirSync(this.themes_folder);
+        this.themes.map((theme: string) => {
+            themes_xml += '<' + theme + ' jcr:primaryType="jnt:folder">';
+            let cssFolders = fs.readdirSync(this. themes_folder + theme);
+            cssFolders.map((css_file: string) => {
+                themes_xml += '<' + css_file + ' jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></' + css_file + '>';
+            });
+            themes_xml += '</' + theme + '>';
         });
+        themes_xml += '</themes>';
+        return themes_xml;
     }
 
+    /*
+    * Clean all css files inside themes folder
+    */
     @Task('clean')
     clean() {
-        return del([this.themesFolder + '/**/*.css']);
+        return del([this.themes_folder + '/**/*.css']);
     }
 
+    /*
+    * Store themes in array
+    */
+    @Task('init')
+    init() {
+        return gulp.src(this.sass_themes + '*.scss')
+            .pipe(rename((path: any) => {
+                this.themes.push(path.basename);
+            }));
+    }
+
+
+    /*
+    * Compile Sass to CSS
+    */
     @Task('build')
     build() {
         let tasks = this.themes.map((theme) => {
-            fs.readFile(this.mainFilesFolder + theme + '.scss', 'utf8', (err: ErrnoException | null, data: string) => {
+            
+            fs.readFile(this.sass_themes + theme + '.scss', 'utf8', (err: ErrnoException | null, data: string) => {
                 if (err) {
                     throw new gutil.PluginError({
                         plugin: 'build',
@@ -61,65 +78,51 @@ export class Gulpfile {
                     });
                 } else {
                     let vars = data.match(/\$(.*?)\:/g);
-                    this.requiredVars.map(requiredVar => {
+                    this.required_vars.map(required_var => {
                         if(vars !== null){
                             let varEx = false;
                             vars.map(a => { 
-                                if(a.indexOf(requiredVar) > -1){ 
+                                if(a.indexOf(required_var) > -1){ 
                                     varEx = true; 
                                 }
                             });
                             if(!varEx){
                                 throw new gutil.PluginError({
                                     plugin: 'build',
-                                    message: 'Required variable ' + requiredVar + ' is not defined'
+                                    message: 'Required variable ' + required_var + ' is not defined'
                                 });
                             };
                         }
                     });
                 }
             });
-            
-            return gulp.src(this.resourcesFolder + this.pattern)
+
+            return gulp.src(this.sass_resources + '*.scss')
                 .pipe(header('@import \'../themes/' + theme + '.scss\';'))
                 .pipe(sass.sync().on('error', gutil.log))
-                .pipe(rename(function (path: any) {
+                .pipe(rename((path: any) => {
                     let file = path.basename + path.extname;
                     path.dirname += '/' + file;
                 }))
-                .pipe(gulp.dest(this.themesFolder + '/' + theme))
+                .pipe(gulp.dest(this.themes_folder + '/' + theme));
 
         });
 
         return merge(tasks);
     }
 
-    @Task()
-    repository() {
-        let themesXml: string = '<themes jcr:mixinTypes="jmix:hasExternalProviderExtension" jcr:primaryType="jnt:folder">';
-
-        let themes = fs.readdirSync(this.themesFolder);
-      
-        themes.forEach((dir:any) => {
-            themesXml += '<' + dir + ' jcr:primaryType="jnt:folder">';
-            let subdirs = fs.readdirSync(this.themesFolder + dir);
-            
-            subdirs.forEach((file:any) => {
-                themesXml += '<' + file + ' jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></' + file + '>';
-            });
-
-            themesXml += '</' + dir + '>';
-        });
-        themesXml += '</themes>';
-
-        this.xml(this.repositoryXml, themesXml);
-        this.xml(this.repositoryXmlGenerated, themesXml);
-
-        return Promise.resolve();
+    /*
+    * Write xml files
+    */
+    @Task('end')
+    end() {
+        return gulp.src([this.repository + 'repository.xml', this.repository + 'repository.xml.generated'])
+        .pipe(replace(/<themes[^>]*>([\s\S]*?)<\/themes>/, this.getXml()))
+        .pipe(gulp.dest(this.repository));
     }
 
     @SequenceTask()
-    run(){
-        return ['clean', 'build', 'repository'];
+    run() {
+        return ['clean', 'init', 'build', 'end'];
     }
 }

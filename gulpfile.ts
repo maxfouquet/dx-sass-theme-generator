@@ -23,7 +23,7 @@ export class Gulpfile {
     private sass_themes: string = './src/main/resources/sass/themes/';
     private themes_folder: string ='./src/main/import/content/modules/' + this.module + '/templates/files/themes/';
 
-    private themes: Array<string> = [];
+    private themes: Array<string> = fs.readdirSync(this.sass_themes);
 
     /*
     * Outputs themes as Xml
@@ -33,8 +33,8 @@ export class Gulpfile {
         this.themes = fs.readdirSync(this.themes_folder);
         this.themes.map((theme: string) => {
             themes_xml += '<' + theme + ' jcr:primaryType="jnt:folder">';
-            let cssFolders = fs.readdirSync(this. themes_folder + theme);
-            cssFolders.map((css_file: string) => {
+            let css_folders = fs.readdirSync(this.themes_folder + theme);
+            css_folders.map((css_file: string) => {
                 themes_xml += '<' + css_file + ' jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></' + css_file + '>';
             });
             themes_xml += '</' + theme + '>';
@@ -52,25 +52,15 @@ export class Gulpfile {
     }
 
     /*
-    * Store themes in array
-    */
-    @Task('init')
-    init() {
-        return gulp.src(this.sass_themes + '*.scss')
-            .pipe(rename((path: any) => {
-                this.themes.push(path.basename);
-            }));
-    }
-
-
-    /*
     * Compile Sass to CSS
     */
     @Task('build')
     build() {
+        gutil.log('Building [' + this.themes + ']');
+
         let tasks = this.themes.map((theme) => {
             
-            fs.readFile(this.sass_themes + theme + '.scss', 'utf8', (err: ErrnoException | null, data: string) => {
+            fs.readFile(this.sass_themes + theme + '/theme.scss', 'utf8', (err: ErrnoException | null, data: string) => {
                 if (err) {
                     throw new gutil.PluginError({
                         plugin: 'build',
@@ -97,15 +87,24 @@ export class Gulpfile {
                 }
             });
 
-            return gulp.src(this.sass_resources + '*.scss')
-                .pipe(header('@import \'../themes/' + theme + '.scss\';'))
+            let subtasks = [];
+
+            subtasks.push(gulp.src(this.sass_themes + theme + '/addons/*.scss')
                 .pipe(sass.sync().on('error', gutil.log))
                 .pipe(rename((path: any) => {
-                    let file = path.basename + path.extname;
-                    path.dirname += '/' + file;
+                    path.dirname += '/' + path.basename + path.extname;
                 }))
-                .pipe(gulp.dest(this.themes_folder + '/' + theme));
+                .pipe(gulp.dest(this.themes_folder + theme)));
 
+            subtasks.push(gulp.src(this.sass_resources + '*.scss')
+                .pipe(header('@import \'../themes/' + theme + '/theme.scss\';'))
+                .pipe(sass.sync().on('error', gutil.log))
+                .pipe(rename((path: any) => {
+                    path.dirname += '/' + path.basename + path.extname;
+                }))
+                .pipe(gulp.dest(this.themes_folder + theme)));
+
+            return subtasks;
         });
 
         return merge(tasks);
@@ -123,6 +122,6 @@ export class Gulpfile {
 
     @SequenceTask()
     run() {
-        return ['clean', 'init', 'build', 'end'];
+        return ['clean', 'build', 'end'];
     }
 }

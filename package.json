@@ -12,10 +12,7 @@
         "@types/gulp-sass": "^4.0.0",
         "@types/gulp-util": "^3.0.34",
         "del": "^5.0.0",
-        "event-stream": "^4.0.1",
-        "glob": "^7.1.4",
         "gulp": "^4.0.2",
-        "gulp-each": "^0.5.0",
         "gulp-header": "^2.0.9",
         "gulp-rename": "^1.4.0",
         "gulp-replace": "^1.0.0",
@@ -24,8 +21,7 @@
         "gulpclass": "^0.2.0",
         "merge-stream": "^2.0.0",
         "ts-node": "^8.3.0",
-        "typescript": "^3.5.3",
-        "xml2js": "^0.4.19"
+        "typescript": "^3.5.3"
     },
     "author": "Max Fouquet <max.fouquet@calvados.fr>",
     "license": "MIT"

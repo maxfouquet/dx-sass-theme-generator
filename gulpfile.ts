@@ -6,11 +6,11 @@ import * as del from 'del';
 import * as sass from 'gulp-sass';
 import * as rename from 'gulp-rename';
 import * as replace from 'gulp-replace';
+import * as PluginError from 'plugin-error';
+import * as log from 'fancy-log';
 
-var PluginError = require('plugin-error');
-var log = require('fancy-log');
-var merge = require('merge-stream');
-var header = require('gulp-header');
+let header = require('gulp-header');
+let merge = require('merge-stream');
 
 @Gulpclass()
 export class Gulpfile {
@@ -36,42 +36,48 @@ export class Gulpfile {
     }
 
     /*
+    * Initial check
+    */
+    init(theme: string){
+        fs.readFile(this.sass_themes + theme + '/theme.scss', 'utf8', (err: ErrnoException | null, data: string) => {
+            if (err) {
+                throw new PluginError({
+                    plugin: 'build',
+                    message: 'Sass file doesn\'t exist for the theme: ' + theme
+                });
+            } else {
+                let vars = data.match(/\$(.*?)\:/g);
+                this.required_vars.map(required_var => {
+                    if(vars !== null){
+                        let varEx = false;
+                        vars.map(a => { 
+                            if(a.indexOf(required_var) > -1){ 
+                                varEx = true; 
+                            }
+                        });
+                        if(!varEx){
+                            throw new PluginError({
+                                plugin: 'build',
+                                message: 'Required variable ' + required_var + ' is not defined for the theme: ' + theme
+                            });
+                        };
+                    }
+                });
+            }
+        });
+    }
+
+    /*
     * Compile Sass to CSS
     */
     @Task('build')
     build() {
         log('Building [' + this.themes + ']');
 
-        let tasks = this.themes.map((theme) => {
-            
-            fs.readFile(this.sass_themes + theme + '/theme.scss', 'utf8', (err: ErrnoException | null, data: string) => {
-                if (err) {
-                    throw new PluginError({
-                        plugin: 'build',
-                        message: 'Sass file doesn\'t exist for the theme: ' + theme
-                    });
-                } else {
-                    let vars = data.match(/\$(.*?)\:/g);
-                    this.required_vars.map(required_var => {
-                        if(vars !== null){
-                            let varEx = false;
-                            vars.map(a => { 
-                                if(a.indexOf(required_var) > -1){ 
-                                    varEx = true; 
-                                }
-                            });
-                            if(!varEx){
-                                throw new PluginError({
-                                    plugin: 'build',
-                                    message: 'Required variable ' + required_var + ' is not defined for the theme: ' + theme
-                                });
-                            };
-                        }
-                    });
-                }
-            });
-
+        let tasks = this.themes.map((theme: string) => {
             let subtasks = [];
+
+            this.init(theme);
 
             subtasks.push(gulp.src(this.sass_themes + theme + '/addons/*.scss')
                 .pipe(sass.sync().on('error', log))
@@ -120,8 +126,8 @@ export class Gulpfile {
     @Task('end')
     end() {
         return gulp.src([this.repository + 'repository.xml', this.repository + 'repository.xml.generated'])
-        .pipe(replace(/<themes[^>]*>([\s\S]*?)<\/themes>/, this.getXml()))
-        .pipe(gulp.dest(this.repository));
+            .pipe(replace(/<themes[^>]*>([\s\S]*?)<\/themes>/, this.getXml()))
+            .pipe(gulp.dest(this.repository));
     }
 
     @SequenceTask()

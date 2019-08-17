@@ -4,10 +4,11 @@ import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as del from 'del';
 import * as sass from 'gulp-sass';
-import * as gutil from 'gulp-util';
 import * as rename from 'gulp-rename';
 import * as replace from 'gulp-replace';
 
+var PluginError = require('plugin-error');
+var log = require('fancy-log');
 var merge = require('merge-stream');
 var header = require('gulp-header');
 
@@ -25,23 +26,6 @@ export class Gulpfile {
 
     private themes: Array<string> = fs.readdirSync(this.sass_themes);
 
-    /*
-    * Outputs themes as Xml
-    */
-    getXml(): string {
-        let themes_xml = '<themes jcr:mixinTypes="jmix:hasExternalProviderExtension" jcr:primaryType="jnt:folder">';
-        this.themes = fs.readdirSync(this.themes_folder);
-        this.themes.map((theme: string) => {
-            themes_xml += '<' + theme + ' jcr:primaryType="jnt:folder">';
-            let css_folders = fs.readdirSync(this.themes_folder + theme);
-            css_folders.map((css_file: string) => {
-                themes_xml += '<' + css_file + ' jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></' + css_file + '>';
-            });
-            themes_xml += '</' + theme + '>';
-        });
-        themes_xml += '</themes>';
-        return themes_xml;
-    }
 
     /*
     * Clean all css files inside themes folder
@@ -56,15 +40,15 @@ export class Gulpfile {
     */
     @Task('build')
     build() {
-        gutil.log('Building [' + this.themes + ']');
+        log('Building [' + this.themes + ']');
 
         let tasks = this.themes.map((theme) => {
             
             fs.readFile(this.sass_themes + theme + '/theme.scss', 'utf8', (err: ErrnoException | null, data: string) => {
                 if (err) {
-                    throw new gutil.PluginError({
+                    throw new PluginError({
                         plugin: 'build',
-                        message: 'Main file doesn\'t exist for the theme: ' + theme
+                        message: 'Sass file doesn\'t exist for the theme: ' + theme
                     });
                 } else {
                     let vars = data.match(/\$(.*?)\:/g);
@@ -77,9 +61,9 @@ export class Gulpfile {
                                 }
                             });
                             if(!varEx){
-                                throw new gutil.PluginError({
+                                throw new PluginError({
                                     plugin: 'build',
-                                    message: 'Required variable ' + required_var + ' is not defined'
+                                    message: 'Required variable ' + required_var + ' is not defined for the theme: ' + theme
                                 });
                             };
                         }
@@ -90,7 +74,7 @@ export class Gulpfile {
             let subtasks = [];
 
             subtasks.push(gulp.src(this.sass_themes + theme + '/addons/*.scss')
-                .pipe(sass.sync().on('error', gutil.log))
+                .pipe(sass.sync().on('error', log))
                 .pipe(rename((path: any) => {
                     path.dirname += '/' + path.basename + path.extname;
                 }))
@@ -98,7 +82,7 @@ export class Gulpfile {
 
             subtasks.push(gulp.src(this.sass_resources + '*.scss')
                 .pipe(header('@import \'../themes/' + theme + '/theme.scss\';'))
-                .pipe(sass.sync().on('error', gutil.log))
+                .pipe(sass.sync().on('error', log))
                 .pipe(rename((path: any) => {
                     path.dirname += '/' + path.basename + path.extname;
                 }))
@@ -108,6 +92,26 @@ export class Gulpfile {
         });
 
         return merge(tasks);
+    }
+
+    /*
+    * Outputs themes as Xml
+    */
+   getXml(): string {
+        let themes_xml = '<themes jcr:mixinTypes="jmix:hasExternalProviderExtension" jcr:primaryType="jnt:folder">';
+        this.themes = fs.readdirSync(this.themes_folder);
+        this.themes.map((theme: string) => {
+            themes_xml += '<' + theme + ' jcr:primaryType="jnt:folder">';
+            let css_folders = fs.readdirSync(this.themes_folder + theme);
+            css_folders.map((css_file: string) => {
+                themes_xml += '<' + css_file + ' jcr:primaryType="jnt:file">';
+                themes_xml += '<jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/>';
+                themes_xml += '</' + css_file + '>';
+            });
+            themes_xml += '</' + theme + '>';
+        });
+        themes_xml += '</themes>';
+        return themes_xml;
     }
 
     /*
@@ -122,6 +126,6 @@ export class Gulpfile {
 
     @SequenceTask()
     run() {
-        return ['clean', 'build', 'end'];
+        return ['build', 'end'];
     }
 }

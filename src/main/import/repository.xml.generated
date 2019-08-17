@@ -14,7 +14,7 @@
                 <contents jcr:primaryType="jnt:contentFolder"/>
                 <templates jcr:primaryType="jnt:templatesFolder">
                     <files jcr:primaryType="jnt:folder">
-                        <themes jcr:mixinTypes="jmix:hasExternalProviderExtension" jcr:primaryType="jnt:folder"><cerulean jcr:primaryType="jnt:folder"><addon.css jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></addon.css><main.css jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></main.css></cerulean><materia jcr:primaryType="jnt:folder"><main.css jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></main.css></materia></themes>
+                        <themes jcr:mixinTypes="jmix:hasExternalProviderExtension" jcr:primaryType="jnt:folder"><cerulean jcr:primaryType="jnt:folder"><addon.css jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></addon.css><main.css jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></main.css><studio.css jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></studio.css></cerulean><materia jcr:primaryType="jnt:folder"><main.css jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></main.css></materia></themes>
                     </files>
                     <contents jcr:primaryType="jnt:contentFolder"/>
                     <themes jcr:mixinTypes="jmix:hasExternalProviderExtension"

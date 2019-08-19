@@ -32,7 +32,7 @@
 <body>
 
     <div class="bodywrapper">
-        
+        <template:area path="pagecontent"/>
     </div>
     <template:theme/>
 

@@ -79,13 +79,23 @@ export class Gulpfile {
 
             this.init(theme);
 
+            // Copying web fonts
+            subtasks.push(gulp.src(this.sass_themes + theme + '/fonts/*.{ttf,woff,woff2,eof,svg}')
+                .pipe(rename((path: any) => {
+                    path.dirname += '/' + path.basename + path.extname;
+                }))
+                .pipe(gulp.dest(this.themes_folder + theme + '/fonts')));
+
+            // Processing additional sass theme
             subtasks.push(gulp.src(this.sass_themes + theme + '/addons/*.scss')
+                .pipe(header('@import \'../theme.scss\';'))
                 .pipe(sass.sync().on('error', log))
                 .pipe(rename((path: any) => {
                     path.dirname += '/' + path.basename + path.extname;
                 }))
                 .pipe(gulp.dest(this.themes_folder + theme)));
 
+            // Processing general sass theme
             subtasks.push(gulp.src(this.sass_resources + '*.scss')
                 .pipe(header('@import \'../themes/' + theme + '/theme.scss\';'))
                 .pipe(sass.sync().on('error', log))

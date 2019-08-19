@@ -32,6 +32,7 @@
 <body>
 
     <div class="bodywrapper">
+        <h1><fmt:message key="label.homepage" /></h1>
         <template:area path="pagecontent"/>
     </div>
     <template:theme/>

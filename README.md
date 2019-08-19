@@ -2,28 +2,27 @@
 
 Build your own Jahia DX themes with Sass
 
-## Define your template set and your themes as empty folders using Studio
-
-### Templates structure
+## Define your themes manually or using Studio
 
 ```
-|-- content
-|-- files
-|-- home.page
-|-- templates
-|   |-- contents
-|   |-- files
-|       |-- themes
-|           |-- cerulean
-|           |-- meteria
-```
-
-### Content structure
-
-```
-|-- templates
-|   |-- base.Template
-|       |-- home.pageTemplate
+|-- src
+|   |-- main
+        |-- resources
+            |-- sass
+                |-- resources
+                    |-- <resource>.scss
+                |-- themes
+                    |-- <theme>
+                        |-- theme.scss
+                        |-- addons
+                            |-- <addon>.scss
+                        |-- fonts
+|-- .gitignore
+|-- gulpfile.ts
+|-- package.json
+|-- pom.xml
+|-- README.md
+|-- tsconfig.json
 ```
 
 ## Build your template set

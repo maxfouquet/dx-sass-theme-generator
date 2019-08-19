@@ -1,0 +1,10 @@
+@font-face {
+    font-family: $font;
+    src: url('../fonts/'+$font-ext+'.'+$font-format) format($font-format);
+    font-weight: normal;
+    font-style: normal;
+}
+
+div.bodywrapper h1 {
+    font-family: $font, sans-serif;
+}

@@ -37,15 +37,15 @@ export class Gulpfile {
     }
 
     /*
-    * Initial check
+    * Initial error handler
     */
-    init(theme: string): void{
+    errorHandler(theme: string): boolean | any {
         fs.readFile(this.sass_themes + theme + '/theme.scss', 'utf8', (err: ErrnoException | null, data: string) => {
             if (err) {
-                throw new PluginError({
+                return {
                     plugin: 'build',
                     message: 'Sass file doesn\'t exist for the theme: ' + theme
-                });
+                };
             } else {
                 let vars = data.match(/\$(.*?)\:/g);
                 this.required_vars.map(required_var => {
@@ -57,15 +57,16 @@ export class Gulpfile {
                             }
                         });
                         if(!varEx){
-                            throw new PluginError({
+                            return {
                                 plugin: 'build',
                                 message: 'Required variable ' + required_var + ' is not defined for the theme: ' + theme
-                            });
+                            };
                         };
                     }
                 });
             }
         });
+        return false;
     }
 
     /*
@@ -78,7 +79,10 @@ export class Gulpfile {
         let tasks: any = this.themes.map((theme: string) => {
             let subtasks = [];
 
-            this.init(theme);
+            let errorHandler = this.errorHandler(theme);
+            if(errorHandler){
+                throw new PluginError(errorHandler);
+            }
 
             // Copying web fonts
             subtasks.push(gulp.src(this.sass_themes + theme + '/fonts/*.{ttf,woff,woff2,eof,svg}')

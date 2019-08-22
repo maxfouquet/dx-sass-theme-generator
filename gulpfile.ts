@@ -1,17 +1,15 @@
 import { Gulpclass, Task, SequenceTask } from 'gulpclass';
 import { ErrnoException } from 'fast-glob/out/types';
-import merge = require('merge-stream');
-
-import * as fs from 'fs';
-import * as gulp from 'gulp';
-import * as del from 'del';
-import * as sass from 'gulp-sass';
-import * as rename from 'gulp-rename';
-import * as replace from 'gulp-replace';
-import * as PluginError from 'plugin-error';
-import * as log from 'fancy-log';
-
-let header = require('gulp-header');
+import merge from 'merge-stream';
+import fs from 'fs';
+import gulp from 'gulp';
+import del from 'del';
+import sass from 'gulp-sass';
+import rename from 'gulp-rename';
+import replace from 'gulp-replace';
+import header from 'gulp-header';
+import PluginError from 'plugin-error';
+import log from 'fancy-log';
 
 @Gulpclass()
 export class Gulpfile {

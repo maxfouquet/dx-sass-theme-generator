@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-      /* Basic Options */
       "target": "es5",
       "module": "commonjs",
       "lib": ["es6"],
@@ -9,6 +8,7 @@
       "outDir": "build/es5",
       "strict": true,
       "experimentalDecorators": true,
-      "emitDecoratorMetadata": true
+      "emitDecoratorMetadata": true,
+      "esModuleInterop": true
     }
   }

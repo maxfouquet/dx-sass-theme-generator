@@ -119,19 +119,17 @@ export class Gulpfile {
     * Outputs themes as Xml
     */
    getXml(): string {
-        let themes_xml = '<themes jcr:mixinTypes="jmix:hasExternalProviderExtension" jcr:primaryType="jnt:folder">';
+        let themes_xml = `<themes jcr:mixinTypes="jmix:hasExternalProviderExtension" jcr:primaryType="jnt:folder">`;
         this.themes = fs.readdirSync(this.themes_folder);
         this.themes.map((theme: string) => {
-            themes_xml += '<' + theme + ' jcr:primaryType="jnt:folder">';
             let css_folders = fs.readdirSync(this.themes_folder + theme);
+            themes_xml += `<${theme} jcr:primaryType="jnt:folder">`;
             css_folders.map((css_file: string) => {
-                themes_xml += '<' + css_file + ' jcr:primaryType="jnt:file">';
-                themes_xml += '<jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/>';
-                themes_xml += '</' + css_file + '>';
+                themes_xml += `<${css_file} jcr:primaryType="jnt:file"><jcr:content jcr:mimeType="text/css" jcr:primaryType="jnt:resource"/></${css_file}>`;
             });
-            themes_xml += '</' + theme + '>';
+            themes_xml += `</${theme}>`;
         });
-        themes_xml += '</themes>';
+        themes_xml += `</themes>`;
         return themes_xml;
     }
 

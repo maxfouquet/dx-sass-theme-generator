@@ -1,5 +1,7 @@
 import { Gulpclass, Task, SequenceTask } from 'gulpclass';
 import { ErrnoException } from 'fast-glob/out/types';
+import merge = require('merge-stream');
+
 import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as del from 'del';
@@ -10,7 +12,6 @@ import * as PluginError from 'plugin-error';
 import * as log from 'fancy-log';
 
 let header = require('gulp-header');
-let merge = require('merge-stream');
 
 @Gulpclass()
 export class Gulpfile {
@@ -31,14 +32,14 @@ export class Gulpfile {
     * Clean all css files inside themes folder
     */
     @Task('clean')
-    clean() {
+    clean(): Promise<string[]> {
         return del([this.themes_folder + '/**/*.css']);
     }
 
     /*
     * Initial check
     */
-    init(theme: string){
+    init(theme: string): void{
         fs.readFile(this.sass_themes + theme + '/theme.scss', 'utf8', (err: ErrnoException | null, data: string) => {
             if (err) {
                 throw new PluginError({
@@ -71,10 +72,10 @@ export class Gulpfile {
     * Compile Sass to CSS
     */
     @Task('build')
-    build() {
+    build(): any {
         log('Building [' + this.themes + ']');
 
-        let tasks = this.themes.map((theme: string) => {
+        let tasks: any = this.themes.map((theme: string) => {
             let subtasks = [];
 
             this.init(theme);
@@ -134,7 +135,7 @@ export class Gulpfile {
     * Write xml files
     */
     @Task('end')
-    end() {
+    end(): any {
         return gulp.src([this.repository + 'repository.xml', this.repository + 'repository.xml.generated'])
             .pipe(replace(/<themes[^>]*>([\s\S]*?)<\/themes>/, this.getXml()))
             .pipe(gulp.dest(this.repository));
